@@ -24,11 +24,11 @@ float get_therm_voltage(int val, float reference, int resolution) {
   return ((float) val)*(reference/(pow(2.0, resolution)-1));
 }
 
-float volt2temp(float voltage, float in_ser_res, float fit_coef[5]) {
-  float therm_res = in_ser_res*(3.3-voltage);
-  float temperature = pow(fit_coef[1]+fit_coef[2]*log(therm_res/in_ser_res)+fit_coef[3]*(pow(log(therm_res/in_ser_res), 2))
-                      +pow(fit_coef[4]*(log(therm_res/in_ser_res)),3)+pow(fit_coef[5]*(log(therm_res/in_ser_res)),4),-1);
-  return (temperature);
+float volt2temp(float voltage, float in_ser_res, float fit_coef[5], float reference) {
+  float therm_res = in_ser_res*(reference-voltage);
+  float temperature = pow(fit_coef[0]+fit_coef[1]*log(therm_res/in_ser_res)+fit_coef[2]*(pow(log(therm_res/in_ser_res), 2))
+                      +pow(fit_coef[3]*(log(therm_res/in_ser_res)),3)+pow(fit_coef[4]*(log(therm_res/in_ser_res)),4),-1);
+  return temperature;
 }
 
 void sample() {
@@ -36,7 +36,7 @@ void sample() {
   for (uint32_t i = 0; i < sizeof(therm_pins); i++) {
     raw_vals[i] = analogRead(therm_pins[i]);
     voltage[i]  = get_therm_voltage(raw_vals[i], REF, RES);
-    temperature[i] = volt2temp(voltage[i], in_ser_res[i], fit_coef[i]);
+    temperature[i] = volt2temp(voltage[i], in_ser_res[i], fit_coef[i], REF);
     Serial.print("  "); Serial.printf("%1.3f", temperature[i]);
   }
   Serial.print("\n");
