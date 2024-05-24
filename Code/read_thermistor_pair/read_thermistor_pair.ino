@@ -12,7 +12,7 @@ uint8_t therm_pins[] = {THERM1, THERM2};
 int     raw_vals[]   = {     0,      0};
 float   voltage[]    = {   0.0,    0.0};
 float   fit_coef[][5]= { {0.0402463, 0.0243041, 0.0078931, 0.0012562, 0.0000655}, 
-                        {0.0408823, 0.0301964, 0.0135852, 0.0033340, 0.0003276} };
+                         {0.0408823, 0.0301964, 0.0135852, 0.0033340, 0.0003276} };
 float in_ser_res[]   = {  9750,   9760};  
 float temperature[]        = {     0,      0};
 
@@ -24,10 +24,10 @@ float get_therm_voltage(int val, float reference, int resolution) {
   return ((float) val)*(reference/(pow(2.0, resolution)-1));
 }
 
-float volt2temp(float voltage, float in_ser_res, float fcoef[5]) {
+float volt2temp(float voltage, float in_ser_res, float fit_coef[5]) {
   float therm_res = in_ser_res*(3.3-voltage);
-  float temperature = (fit_coef[1]+fit_coef[2]*(log(therm_res/in_ser_res))+fit_coef[3]*(log(therm_res/in_ser_res))^2
-   +fit_coef[4]*(log(therm_res/in_ser_res))^3+fit_coef[5]*(log(therm_res/in_ser_res))^4)^(-1);
+  float temperature = pow(fit_coef[1]+fit_coef[2]*log(therm_res/in_ser_res)+fit_coef[3]*(pow(log(therm_res/in_ser_res), 2))
+                      +pow(fit_coef[4]*(log(therm_res/in_ser_res)),3)+pow(fit_coef[5]*(log(therm_res/in_ser_res)),4),-1);
   return (temperature);
 }
 
@@ -36,7 +36,7 @@ void sample() {
   for (uint32_t i = 0; i < sizeof(therm_pins); i++) {
     raw_vals[i] = analogRead(therm_pins[i]);
     voltage[i]  = get_therm_voltage(raw_vals[i], REF, RES);
-    temperature[i] = volt2temp(voltage[i], in_ser_res[i], fit_coef[i]]);
+    temperature[i] = volt2temp(voltage[i], in_ser_res[i], fit_coef[i]);
     Serial.print("  "); Serial.printf("%1.3f", temperature[i]);
   }
   Serial.print("\n");
@@ -68,3 +68,9 @@ void loop() {
   
   delay(500);
 }
+
+
+/*
+fit_coef[1]+fit_coef[2]*log(therm_res/in_ser_res)+
++fit_coef[4]*((log(therm_res/in_ser_res))^3)+fit_coef[5]*((log(therm_res/in_ser_res))^4))^(-1);
+*/
