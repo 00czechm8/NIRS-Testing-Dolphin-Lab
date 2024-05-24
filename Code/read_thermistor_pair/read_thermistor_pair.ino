@@ -11,7 +11,7 @@
 uint8_t therm_pins[] = {THERM1, THERM2};
 int     raw_vals[]   = {     0,      0};
 float   voltage[]    = {   0.0,    0.0};
-float fit_coef[][5] = { {0.0402463, 0.0243041, 0.0078931, 0.0012562, 0.0000655}, 
+float   fit_coef[][5]= { {0.0402463, 0.0243041, 0.0078931, 0.0012562, 0.0000655}, 
                         {0.0408823, 0.0301964, 0.0135852, 0.0033340, 0.0003276} };
 float in_ser_res[]   = {  9750,   9760};  
 float temperature[]        = {     0,      0};
@@ -24,7 +24,7 @@ float get_therm_voltage(int val, float reference, int resolution) {
   return ((float) val)*(reference/(pow(2.0, resolution)-1));
 }
 
-float volt2temp(float voltage, float in_ser_res, float fit_coef[5]) {
+float volt2temp(float voltage, float in_ser_res, float fcoef[5]) {
   float therm_res = in_ser_res*(3.3-voltage);
   float temperature = (fit_coef[1]+fit_coef[2]*(log(therm_res/in_ser_res))+fit_coef[3]*(log(therm_res/in_ser_res))^2
    +fit_coef[4]*(log(therm_res/in_ser_res))^3+fit_coef[5]*(log(therm_res/in_ser_res))^4)^(-1);
