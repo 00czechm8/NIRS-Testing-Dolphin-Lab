@@ -1,0 +1,42 @@
+T = [23.3 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 105 110 115 120];
+v1 = [1.535 1.745 1.894 2.032 2.284 2.484 2.571 2.642 2.790 2.832 2.877 2.955 3.000 3.048 3.097 3.119 3.123 3.148 3.171 3.181 3.190];
+v2 = [1.577 1.755 1.842 2.003 2.223 2.403 2.500 2.571 2.723 2.771 2.826 2.903 2.952 3.000 3.055 3.084 3.097 3.123 3.148 3.161 3.171];
+
+max_res = [];
+
+for i = 1:20
+    % figure;
+    % plot(v1, T)
+    hold on
+    % plot(v2, T)
+    p1 = polyfit(v1,T,7);
+    x = 1.4:0.01:3.3;
+    y1 = polyval(p1, v1);
+    % plot(v1,y1)
+    hold off
+    
+    % figure;
+    % plot(v2, T)
+    hold on
+    % plot(v2, T)
+    p2 = polyfit(v2,T,7);
+    x = 1.4:0.01:3.3;
+    y2 = polyval(p2, v2);
+    % plot(v2,y2)
+    hold off
+    
+    % figure;
+    y1_res = polyval(p1, v1);
+    y2_res = polyval(p2, v2);
+    res1 = T-y1_res;
+    res2 = T-y2_res;
+    hold on 
+    % plot(v1,res1);
+    % plot(v2, res2);
+    % title("Residuals, Meas. - Pred.")
+    hold off
+    
+    max_res(:,i) = [max(res1); max(res2)];
+    
+end
+
