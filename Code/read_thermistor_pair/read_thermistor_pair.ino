@@ -16,6 +16,10 @@ float   fit_coef[][5]= { {0.0402463, 0.0243041, 0.0078931, 0.0012562, 0.0000655}
 float in_ser_res[]   = {  9750,   9760};  
 float temperature[]        = {     0,      0};
 
+float Temps[] = {23.3, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120};
+float v[][21] = { {1.535, 1.745, 1.894, 2.032, 2.284, 2.484, 2.571, 2.642, 2.790, 2.832, 2.877, 2.955, 3.000, 3.048, 3.097, 3.119, 3.123, 3.148, 3.171, 3.181, 3.190},
+              {1.577, 1.755, 1.842, 2.003, 2.223, 2.403, 2.500, 2.571, 2.723, 2.771, 2.826, 2.903, 2.952, 3.000, 3.055, 3.084, 3.097, 3.123, 3.148, 3.161, 3.171}};
+
 elapsedMillis timer;
 uint8_t byte_recieved;
 bool    is_sampling;
@@ -24,11 +28,33 @@ float get_therm_voltage(int val, float reference, int resolution) {
   return ((float) val)*(reference/(pow(2.0, resolution)-1));
 }
 
-float volt2temp(float voltage, float in_ser_res, float fit_coef[5], float reference) {
+float volt2temp1(float voltage, float in_ser_res, float fit_coef[5], float reference) {
   float therm_res = in_ser_res*(reference-voltage);
   float temperature = pow(fit_coef[0]+fit_coef[1]*log(therm_res/in_ser_res)+fit_coef[2]*(pow(log(therm_res/in_ser_res), 2))
                       +pow(fit_coef[3]*(log(therm_res/in_ser_res)),3)+pow(fit_coef[4]*(log(therm_res/in_ser_res)),4),-1);
+  //return 2.495*exp(1.179*voltage);
   return temperature;
+}
+
+float volt2temp2(float voltage, float volt_lookup[21], float temp_lookup[21]){
+  int ub_loc =0;
+  for (int i=0; i<=21; i++){
+    if(voltage > volt_lookup[i]){
+      continue;
+    }
+    else if(voltage<volt_lookup[0]){
+      ub_loc = 1;
+      break;
+    }
+    else{
+      ub_loc = i;
+      break;
+    }
+
+  }
+    int lb_loc = ub_loc-1;
+   
+  return ((temp_lookup[ub_loc]-temp_lookup[lb_loc])/(volt_lookup[ub_loc]-volt_lookup[lb_loc]))*(voltage-volt_lookup[lb_loc])+temp_lookup[lb_loc];
 }
 
 void sample() {
@@ -36,8 +62,9 @@ void sample() {
   for (uint32_t i = 0; i < sizeof(therm_pins); i++) {
     raw_vals[i] = analogRead(therm_pins[i]);
     voltage[i]  = get_therm_voltage(raw_vals[i], REF, RES);
-    temperature[i] = volt2temp(voltage[i], in_ser_res[i], fit_coef[i], REF);
-    Serial.print("  "); Serial.printf("%1.3f", temperature[i]);
+    temperature[i] = volt2temp2(voltage[i], v[i], Temps);
+   // temperature[i] = volt2temp1(voltage[i], in_ser_res[i], fit_coef[i], REF);
+    Serial.print("  "); Serial.printf("%1.3f",temperature[i]);
   }
   Serial.print("\n");
 }
