@@ -48,8 +48,8 @@ hold off
 % hold on
 % plot(heightsPLA, sstempsPLA);
 % plot(heightsAluminum, sstempsAluminum)
-% plot(heightsTough, sstempsTough)
-% plot(heightsSili, sstempsSili)
+% % plot(heightsTough, sstempsTough)
+% % plot(heightsSili, sstempsSili)
 
 
 % x0 = 9;
@@ -64,8 +64,8 @@ hold off
 % x = 0:0.01:round(max(heightsPLA));
 % plot(x,fitPLA*log(x+1), "--b")
 % plot(x,fitAluminum*log(x+1), "--r")
-% plot(x,fitTough*log(x+1), "--", "Color", "#EDB120")
-% plot(x,fitSili*log(x+1), "--", "Color", "#7E2F8E")
+% % plot(x,fitTough*log(x+1), "--", "Color", "#EDB120")
+% % plot(x,fitSili*log(x+1), "--", "Color", "#7E2F8E")
 % hold off 
 
 % % text(0.1, 19, "% Drop for PLA [%] = "+string(m1)+"*Shim Ht. [mm]")
